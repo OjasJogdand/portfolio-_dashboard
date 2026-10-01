@@ -1,0 +1,16 @@
+Technical Document: Key Challenges and Solutions
+
+1. Managing API Rate Limits and Caching
+Challenge: The frontend requests portfolio data every 15 seconds to keep the dashboard snappy. If we hit external APIs (like Yahoo or Google Finance) every 15 seconds, we would get rate-limited instantly.
+Solution: We introduced a caching layer in the backend. 
+- When the frontend asks for data every 15 seconds, the backend checks if its cached prices are older than 60 seconds. 
+- If the cache is fresh (under 60 seconds old), it returns the saved data. 
+- If not, it fetches new data from Yahoo Finance and updates the cache. This reduces our API calls from every 15 seconds down to just once per minute.
+
+2. Fetching Fundamental Data via SerpApi
+Challenge: We needed reliable P/E ratios and Latest Earnings. The standard Google Finance doesn't have an open API, and our free SerpApi plan is limited to 250 searches per month.
+Solution: We used SerpApi to scrape Google Finance. To stay within the free tier, we set up a separate cache for these fundamental metrics. The backend only fetches SerpApi data once every 24 hours per stock, saving it in the cache while the live prices continue to update every 60 seconds.
+
+3. Handling Missing Data Gracefully
+Challenge: Some stocks (like LTI Mindtree and Savani Financials) simply lack fundamental stats in Google Finance due to recent mergers or being micro-cap companies.
+Solution: We added fallback logic that catches these missing data points and displays "N/A" or "-" instead of crashing the application or showing errors.
