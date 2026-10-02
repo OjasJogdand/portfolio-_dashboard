@@ -80,7 +80,7 @@ export async function fetchSerpApiFinance(exchangeCode: string): Promise<{ peRat
     let earnings = null;
 
     // SerpApi for Google Finance returns stats inside knowledge_graph
-    const stats = response.data.knowledge_graph?.key_stats?.stats || [];
+    const stats = response?.data?.knowledge_graph?.key_stats?.stats || [];
     for (const item of stats) {
       if (item.label && item.label.includes('P/E ratio')) {
         peRatio = item.value;
