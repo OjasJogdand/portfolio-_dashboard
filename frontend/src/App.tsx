@@ -42,7 +42,12 @@ export default function App() {
   // Fetch portfolio data from the backend
   const fetchPortfolio = async () => {
     try {
-      const response = await axios.get('https://portfolio-dashboard-upu8.onrender.com/api/portfolio');
+      // Use localhost when running locally, and Render URL when deployed
+      const apiUrl = import.meta.env.DEV 
+        ? 'http://localhost:3001/api/portfolio' 
+        : 'https://portfolio-dashboard-upu8.onrender.com/api/portfolio';
+        
+      const response = await axios.get(apiUrl);
       setData(response.data);
       setError(null);
     } catch (err) {
