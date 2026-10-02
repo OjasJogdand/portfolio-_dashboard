@@ -14,3 +14,7 @@ Solution: We used SerpApi to scrape Google Finance. To stay within the free tier
 3. Handling Missing Data Gracefully
 Challenge: Some stocks (like LTI Mindtree and Savani Financials) simply lack fundamental stats in Google Finance due to recent mergers or being micro-cap companies.
 Solution: We added fallback logic that catches these missing data points and displays "N/A" or "-" instead of crashing the application or showing errors.
+
+4. Known Limitations: Yahoo Finance API on Cloud Servers
+Challenge: The `yahoo-finance2` library relies on Yahoo Finance's public endpoint to fetch live stock prices. While this works perfectly during local development (because Yahoo allows standard home IP addresses), Yahoo's strict anti-bot firewall actively blocks requests originating from known data center IPs (such as Render, Heroku, or AWS).
+Implication: When deployed to Render, the Yahoo Finance API requests fail and return "N/A" due to this network-level block. To completely bypass this in a production environment, one would need to either use a paid stock API (like Alpha Vantage), route requests through a residential proxy, or implement a custom web scraper.
