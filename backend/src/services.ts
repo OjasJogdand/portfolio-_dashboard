@@ -21,7 +21,8 @@ export async function fetchCMP(exchangeCode: string): Promise<number | null> {
       
       const response = await axios.get(`https://www.google.com/finance/quote/${ticker}:${exchange}`, {
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Cookie': 'CONSENT=YES+'
         }
       });
       
@@ -57,13 +58,23 @@ export async function fetchSerpApiFinance(exchangeCode: string): Promise<{ peRat
     const exchange = suffix === 'NS' ? 'NSE' : 'BOM';
     const query = `${ticker}:${exchange}`;
 
-    const response = await axios.get('https://serpapi.com/search.json', {
-      params: {
-        engine: 'google_finance',
-        q: query,
-        api_key: apiKey
+    let response;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        response = await axios.get('https://serpapi.com/search.json', {
+          params: {
+            engine: 'google_finance',
+            q: query,
+            api_key: apiKey
+          },
+          timeout: 10000 // 10s timeout to prevent hanging
+        });
+        break; // Success, exit retry loop
+      } catch (err) {
+        if (attempt === 3) throw err; // Throw on final failure
+        await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2s before retry
       }
-    });
+    }
 
     let peRatio = null;
     let earnings = null;
